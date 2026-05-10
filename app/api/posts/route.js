@@ -23,15 +23,11 @@ export async function POST(request) {
     });
 
     const post = await prisma.post.create({
-      data: {
-        title,
-        content,
-        communityId,
-        authorId: user.id,
-      },
+      data: { title, content, communityId, authorId: user.id },
       include: {
         author: { select: { username: true } },
         community: { select: { name: true, slug: true } },
+        votes: true,
         _count: { select: { votes: true, comments: true } },
       },
     });
@@ -53,11 +49,18 @@ export async function GET(request) {
       include: {
         author: { select: { username: true } },
         community: { select: { name: true, slug: true } },
+        votes: true,
         _count: { select: { votes: true, comments: true } },
       },
     });
 
-    return NextResponse.json(posts);
+    const postsWithScore = posts.map((post) => ({
+      ...post,
+      voteScore: post.votes.filter((v) => v.type === "UP").length -
+                 post.votes.filter((v) => v.type === "DOWN").length,
+    }));
+
+    return NextResponse.json(postsWithScore);
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

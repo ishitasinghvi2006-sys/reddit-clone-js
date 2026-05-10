@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import VoteButton from "../../components/VoteButton";
 
 export default function CommunityPage() {
   const { slug } = useParams();
@@ -41,7 +42,6 @@ export default function CommunityPage() {
 
   return (
     <div>
-      {/* Community Header */}
       <div className="bg-orange-500 rounded-lg p-6 mb-4 text-white">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-orange-500 font-bold text-2xl">
@@ -57,7 +57,6 @@ export default function CommunityPage() {
         <p className="text-orange-100 text-sm">{community._count.posts} posts</p>
       </div>
 
-      {/* Create Post Button */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="font-semibold text-gray-700">Posts</h2>
         {session && (
@@ -68,7 +67,6 @@ export default function CommunityPage() {
         )}
       </div>
 
-      {/* Posts List */}
       {posts.length === 0 ? (
         <div className="bg-white rounded-lg p-8 text-center text-gray-400">
           <p>No posts yet. Be the first to post!</p>
@@ -76,24 +74,30 @@ export default function CommunityPage() {
       ) : (
         <div className="space-y-3">
           {posts.map((post) => (
-            <Link key={post.id} href={`/r/${slug}/${post.id}`}
-              className="bg-white rounded-lg p-4 block hover:shadow-md transition-shadow">
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500 mb-1">
-                    Posted by u/{post.author.username}
-                  </p>
-                  <h3 className="font-semibold text-gray-800 text-lg">{post.title}</h3>
-                  {post.content && (
-                    <p className="text-gray-600 text-sm mt-1 line-clamp-2">{post.content}</p>
-                  )}
-                  <div className="flex gap-4 mt-3 text-xs text-gray-500">
-                    <span>👍 {post._count.votes} votes</span>
-                    <span>💬 {post._count.comments} comments</span>
-                  </div>
-                </div>
+            <div key={post.id} className="bg-white rounded-lg p-4 hover:shadow-md transition-shadow flex gap-3">
+              {/* Vote buttons */}
+              <div className="flex flex-col items-center">
+                <VoteButton
+                  postId={post.id}
+                  initialVotes={post.voteScore || 0}
+                  initialUserVote={null}
+                />
               </div>
-            </Link>
+
+              {/* Post content */}
+              <Link href={`/r/${slug}/${post.id}`} className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">
+                  Posted by u/{post.author.username}
+                </p>
+                <h3 className="font-semibold text-gray-800 text-lg">{post.title}</h3>
+                {post.content && (
+                  <p className="text-gray-600 text-sm mt-1 line-clamp-2">{post.content}</p>
+                )}
+                <div className="flex gap-4 mt-3 text-xs text-gray-500">
+                  <span>💬 {post._count.comments} comments</span>
+                </div>
+              </Link>
+            </div>
           ))}
         </div>
       )}
