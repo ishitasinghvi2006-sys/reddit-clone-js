@@ -75,7 +75,6 @@ export default function CommunityPage() {
         <div className="space-y-3">
           {posts.map((post) => (
             <div key={post.id} className="bg-white rounded-lg p-4 hover:shadow-md transition-shadow flex gap-3">
-              {/* Vote buttons */}
               <div className="flex flex-col items-center">
                 <VoteButton
                   postId={post.id}
@@ -83,20 +82,24 @@ export default function CommunityPage() {
                   initialUserVote={null}
                 />
               </div>
-
-              {/* Post content */}
-              <Link href={`/r/${slug}/${post.id}`} className="flex-1">
+              <div className="flex-1">
                 <p className="text-xs text-gray-500 mb-1">
                   Posted by u/{post.author.username}
                 </p>
-                <h3 className="font-semibold text-gray-800 text-lg">{post.title}</h3>
+                <Link href={`/r/${slug}/${post.id}`}>
+                  <h3 className="font-semibold text-gray-800 text-lg hover:text-orange-500 cursor-pointer">
+                    {post.title}
+                  </h3>
+                </Link>
                 {post.content && (
                   <p className="text-gray-600 text-sm mt-1 line-clamp-2">{post.content}</p>
                 )}
                 <div className="flex gap-4 mt-3 text-xs text-gray-500">
-                  <span>💬 {post._count.comments} comments</span>
+                  <Link href={`/r/${slug}/${post.id}`} className="hover:text-orange-500">
+                    💬 {post._count.comments} comments
+                  </Link>
                 </div>
-              </Link>
+              </div>
             </div>
           ))}
         </div>

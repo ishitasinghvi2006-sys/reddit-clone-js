@@ -11,6 +11,7 @@ export async function GET(request, { params }) {
       include: {
         author: { select: { username: true } },
         community: { select: { name: true, slug: true } },
+        votes: true,
         comments: {
           include: { author: { select: { username: true } } },
           orderBy: { createdAt: "desc" },
