@@ -12,6 +12,7 @@ export default function CommunityPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [sort, setSort] = useState("new");
 
   useEffect(() => {
     fetch(`/api/communities/${slug}`)
@@ -31,7 +32,18 @@ export default function CommunityPage() {
       });
   }, [slug]);
 
-  if (loading) return <div className="animate-pulse bg-white rounded-lg h-40" />;
+  const sortedPosts = [...posts].sort((a, b) => {
+    if (sort === "top") return (b.voteScore || 0) - (a.voteScore || 0);
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
+  if (loading) return (
+    <div className="space-y-3">
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="bg-white rounded-lg p-4 animate-pulse h-24" />
+      ))}
+    </div>
+  );
 
   if (notFound) return (
     <div className="bg-white rounded-lg p-8 text-center">
@@ -42,6 +54,7 @@ export default function CommunityPage() {
 
   return (
     <div>
+      {/* Community Header */}
       <div className="bg-orange-500 rounded-lg p-6 mb-4 text-white">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-orange-500 font-bold text-2xl">
@@ -57,8 +70,30 @@ export default function CommunityPage() {
         <p className="text-orange-100 text-sm">{community._count.posts} posts</p>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="font-semibold text-gray-700">Posts</h2>
+      {/* Sort + Create Post bar */}
+      <div className="bg-white rounded-lg p-3 mb-4 flex items-center justify-between">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setSort("new")}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              sort === "new"
+                ? "bg-orange-500 text-white"
+                : "text-gray-500 hover:bg-gray-100"
+            }`}
+          >
+            🕐 New
+          </button>
+          <button
+            onClick={() => setSort("top")}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              sort === "top"
+                ? "bg-orange-500 text-white"
+                : "text-gray-500 hover:bg-gray-100"
+            }`}
+          >
+            🔥 Top
+          </button>
+        </div>
         {session && (
           <Link href={`/r/${slug}/create-post`}
             className="bg-orange-500 text-white px-4 py-1.5 rounded-full text-sm hover:bg-orange-600">
@@ -67,35 +102,43 @@ export default function CommunityPage() {
         )}
       </div>
 
-      {posts.length === 0 ? (
+      {/* Posts */}
+      {sortedPosts.length === 0 ? (
         <div className="bg-white rounded-lg p-8 text-center text-gray-400">
-          <p>No posts yet. Be the first to post!</p>
+          <p className="text-lg mb-2">No posts yet!</p>
+          <p className="text-sm">Be the first to post in this community.</p>
+          {session && (
+            <Link href={`/r/${slug}/create-post`}
+              className="inline-block mt-4 bg-orange-500 text-white px-4 py-2 rounded-full text-sm hover:bg-orange-600">
+              Create Post
+            </Link>
+          )}
         </div>
       ) : (
         <div className="space-y-3">
-          {posts.map((post) => (
+          {sortedPosts.map((post) => (
             <div key={post.id} className="bg-white rounded-lg p-4 hover:shadow-md transition-shadow flex gap-3">
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center pt-1">
                 <VoteButton
                   postId={post.id}
                   initialVotes={post.voteScore || 0}
                   initialUserVote={null}
                 />
               </div>
-              <div className="flex-1">
-                <p className="text-xs text-gray-500 mb-1">
-                  Posted by u/{post.author.username}
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-gray-400 mb-1">
+                  Posted by <span className="text-orange-500">u/{post.author.username}</span> • {new Date(post.createdAt).toLocaleDateString()}
                 </p>
                 <Link href={`/r/${slug}/${post.id}`}>
-                  <h3 className="font-semibold text-gray-800 text-lg hover:text-orange-500 cursor-pointer">
+                  <h3 className="font-semibold text-gray-800 text-base hover:text-orange-500 cursor-pointer leading-snug">
                     {post.title}
                   </h3>
                 </Link>
                 {post.content && (
-                  <p className="text-gray-600 text-sm mt-1 line-clamp-2">{post.content}</p>
+                  <p className="text-gray-500 text-sm mt-1 line-clamp-2">{post.content}</p>
                 )}
-                <div className="flex gap-4 mt-3 text-xs text-gray-500">
-                  <Link href={`/r/${slug}/${post.id}`} className="hover:text-orange-500">
+                <div className="flex gap-4 mt-2 text-xs text-gray-400">
+                  <Link href={`/r/${slug}/${post.id}`} className="hover:text-orange-500 flex items-center gap-1">
                     💬 {post._count.comments} comments
                   </Link>
                 </div>

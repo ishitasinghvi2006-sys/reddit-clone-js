@@ -13,12 +13,18 @@ export default function CommunitiesPage() {
   }, []);
 
   if (loading) return (
-    <div className="space-y-3">
-      {[...Array(3)].map((_, i) => (
-        <div key={i} className="bg-white rounded-lg p-4 animate-pulse h-20" />
-      ))}
-    </div>
-  );
+  <div className="space-y-3">
+    {[...Array(4)].map((_, i) => (
+      <div key={i} className="bg-white rounded-lg p-4 animate-pulse flex gap-3">
+        <div className="w-10 h-10 bg-gray-200 rounded-full" />
+        <div className="flex-1 space-y-2">
+          <div className="h-4 bg-gray-200 rounded w-1/3" />
+          <div className="h-3 bg-gray-200 rounded w-1/4" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
   return (
     <div>
