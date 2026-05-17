@@ -12,12 +12,23 @@ export default function CreatePostPage() {
   const [community, setCommunity] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     fetch(`/api/communities/${slug}`)
       .then((res) => res.json())
       .then((data) => setCommunity(data));
   }, [slug]);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
 
   if (!session) {
     return (
@@ -35,6 +46,27 @@ export default function CreatePostPage() {
     setLoading(true);
     setError("");
 
+    let imageUrl = null;
+
+    if (imageFile) {
+      setUploading(true);
+      const formData = new FormData();
+      formData.append("file", imageFile);
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const uploadData = await uploadRes.json();
+      if (!uploadRes.ok) {
+        setError("Image upload failed");
+        setLoading(false);
+        setUploading(false);
+        return;
+      }
+      imageUrl = uploadData.url;
+      setUploading(false);
+    }
+
     const res = await fetch("/api/posts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -42,6 +74,7 @@ export default function CreatePostPage() {
         title: form.title,
         content: form.content,
         communityId: community?.id,
+        imageUrl,
       }),
     });
 
@@ -84,10 +117,39 @@ export default function CreatePostPage() {
             <textarea
               placeholder="Text (optional)"
               className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-              rows={6}
+              rows={4}
               value={form.content}
               onChange={(e) => setForm({ ...form, content: e.target.value })}
             />
+          </div>
+
+          {/* Image Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Image (optional)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-orange-50 file:text-orange-500 hover:file:bg-orange-100"
+            />
+            {imagePreview && (
+              <div className="mt-3">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="max-h-48 rounded-lg object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => { setImageFile(null); setImagePreview(null); }}
+                  className="mt-1 text-xs text-red-500 hover:underline"
+                >
+                  Remove image
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="flex gap-3">
@@ -103,7 +165,7 @@ export default function CreatePostPage() {
               disabled={loading || !form.title}
               className="flex-1 bg-orange-500 text-white py-2 rounded-full text-sm hover:bg-orange-600 disabled:opacity-50"
             >
-              {loading ? "Posting..." : "Post"}
+              {uploading ? "Uploading image..." : loading ? "Posting..." : "Post"}
             </button>
           </div>
         </form>

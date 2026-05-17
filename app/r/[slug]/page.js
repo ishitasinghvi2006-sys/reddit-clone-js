@@ -76,9 +76,7 @@ export default function CommunityPage() {
           <button
             onClick={() => setSort("new")}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              sort === "new"
-                ? "bg-orange-500 text-white"
-                : "text-gray-500 hover:bg-gray-100"
+              sort === "new" ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"
             }`}
           >
             🕐 New
@@ -86,9 +84,7 @@ export default function CommunityPage() {
           <button
             onClick={() => setSort("top")}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              sort === "top"
-                ? "bg-orange-500 text-white"
-                : "text-gray-500 hover:bg-gray-100"
+              sort === "top" ? "bg-orange-500 text-white" : "text-gray-500 hover:bg-gray-100"
             }`}
           >
             🔥 Top
@@ -106,7 +102,6 @@ export default function CommunityPage() {
       {sortedPosts.length === 0 ? (
         <div className="bg-white rounded-lg p-8 text-center text-gray-400">
           <p className="text-lg mb-2">No posts yet!</p>
-          <p className="text-sm">Be the first to post in this community.</p>
           {session && (
             <Link href={`/r/${slug}/create-post`}
               className="inline-block mt-4 bg-orange-500 text-white px-4 py-2 rounded-full text-sm hover:bg-orange-600">
@@ -130,15 +125,22 @@ export default function CommunityPage() {
                   Posted by <span className="text-orange-500">u/{post.author.username}</span> • {new Date(post.createdAt).toLocaleDateString()}
                 </p>
                 <Link href={`/r/${slug}/${post.id}`}>
-                  <h3 className="font-semibold text-gray-800 text-base hover:text-orange-500 cursor-pointer leading-snug">
+                  <h3 className="font-semibold text-gray-800 text-base hover:text-orange-500 cursor-pointer">
                     {post.title}
                   </h3>
                 </Link>
                 {post.content && (
                   <p className="text-gray-500 text-sm mt-1 line-clamp-2">{post.content}</p>
                 )}
+                {post.imageUrl && (
+                  <img
+                    src={post.imageUrl}
+                    alt={post.title}
+                    className="mt-2 rounded-lg max-h-64 object-cover w-full"
+                  />
+                )}
                 <div className="flex gap-4 mt-2 text-xs text-gray-400">
-                  <Link href={`/r/${slug}/${post.id}`} className="hover:text-orange-500 flex items-center gap-1">
+                  <Link href={`/r/${slug}/${post.id}`} className="hover:text-orange-500">
                     💬 {post._count.comments} comments
                   </Link>
                 </div>
