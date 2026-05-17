@@ -16,9 +16,9 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           {session ? (
             <>
-              <span className="text-sm text-gray-600">
-                u/{session.user.username}
-              </span>
+              <Link href={`/u/${session.user.username}`} className="text-sm text-gray-600 hover:text-orange-500">
+              u/{session.user.username}
+              </Link>
               <Link
                 href="/communities/create"
                 className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600"
