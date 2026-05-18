@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import VoteButton from "../../../components/VoteButton";
+import toast from "react-hot-toast";
 
 export default function PostPage() {
   const { slug, postId } = useParams();
@@ -40,6 +41,7 @@ export default function PostPage() {
     if (res.ok) {
       setComments([data, ...comments]);
       setComment("");
+      toast.success("Comment posted!");
     }
     setSubmitting(false);
   };

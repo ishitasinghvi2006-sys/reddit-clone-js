@@ -5,8 +5,11 @@ import Navbar from "./components/Navbar";
 import "./globals.css";
 
 export const metadata = {
-  title: "Reddit Clone",
-  description: "A Reddit clone built with Next.js",
+  title: {
+    default: "Reddit Clone",
+    template: "%s | Reddit Clone",
+  },
+  description: "A Reddit clone built with Next.js, Prisma and Supabase",
 };
 
 export default async function RootLayout({ children }) {

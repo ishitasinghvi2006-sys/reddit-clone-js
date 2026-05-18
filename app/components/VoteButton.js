@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function VoteButton({ postId, initialVotes, initialUserVote }) {
   const { data: session } = useSession();
@@ -12,6 +13,7 @@ export default function VoteButton({ postId, initialVotes, initialUserVote }) {
 
   const handleVote = async (type) => {
     if (!session) {
+      toast.error("Login to vote!");
       router.push("/login");
       return;
     }
@@ -47,16 +49,15 @@ export default function VoteButton({ postId, initialVotes, initialUserVote }) {
       <button
         onClick={(e) => { e.preventDefault(); handleVote("UP"); }}
         disabled={loading}
-        className={`p-1 rounded text-lg transition-colors ${
-          userVote === "UP"
-            ? "text-orange-500"
-            : "text-gray-400 hover:text-orange-500"
-        }`}
+        title="Upvote"
+        className={`p-1 rounded transition-all hover:scale-110 ${
+          userVote === "UP" ? "text-orange-500" : "text-gray-400 hover:text-orange-500"
+        } disabled:opacity-50`}
       >
         ▲
       </button>
 
-      <span className={`font-bold text-sm min-w-[20px] text-center ${
+      <span className={`font-bold text-sm min-w-[24px] text-center ${
         userVote === "UP" ? "text-orange-500" :
         userVote === "DOWN" ? "text-blue-500" : "text-gray-700"
       }`}>
@@ -66,11 +67,10 @@ export default function VoteButton({ postId, initialVotes, initialUserVote }) {
       <button
         onClick={(e) => { e.preventDefault(); handleVote("DOWN"); }}
         disabled={loading}
-        className={`p-1 rounded text-lg transition-colors ${
-          userVote === "DOWN"
-            ? "text-blue-500"
-            : "text-gray-400 hover:text-blue-500"
-        }`}
+        title="Downvote"
+        className={`p-1 rounded transition-all hover:scale-110 ${
+          userVote === "DOWN" ? "text-blue-500" : "text-gray-400 hover:text-blue-500"
+        } disabled:opacity-50`}
       >
         ▼
       </button>
