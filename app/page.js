@@ -17,7 +17,12 @@ export default function Home() {
       .then((data) => { setPosts(data); setLoading(false); });
     fetch("/api/communities")
       .then((res) => res.json())
-      .then((data) => setCommunities(data.slice(0, 5)));
+      .then((data) => {
+  const unique = data.filter((c, index, self) =>
+    index === self.findIndex((t) => t.slug === c.slug)
+  );
+  setCommunities(unique.slice(0, 5));
+});
   }, []);
 
   const sortedPosts = [...posts].sort((a, b) => {
@@ -95,7 +100,7 @@ export default function Home() {
                     )}
                     <div className="flex gap-4 mt-2 text-xs text-gray-400">
                       <Link href={`/r/${post.community.slug}/${post.id}`} className="hover:text-orange-500">
-                        💬 {post._count.comments} comments
+                        💬 {post._count.comments} {post._count.comments === 1 ? "comment" : "comments"}
                       </Link>
                     </div>
                   </div>

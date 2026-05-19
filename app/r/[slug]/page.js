@@ -15,22 +15,26 @@ export default function CommunityPage() {
   const [sort, setSort] = useState("new");
 
   useEffect(() => {
-    fetch(`/api/communities/${slug}`)
-      .then((res) => {
-        if (!res.ok) { setNotFound(true); setLoading(false); return null; }
-        return res.json();
-      })
-      .then((data) => {
-        if (data) {
-          setCommunity(data);
-          return fetch(`/api/posts?communityId=${data.id}`);
-        }
-      })
-      .then((res) => res && res.json())
-      .then((data) => {
-        if (data) { setPosts(data); setLoading(false); }
-      });
-  }, [slug]);
+  fetch(`/api/communities/${slug}`)
+    .then((res) => {
+      if (!res.ok) { setNotFound(true); setLoading(false); return null; }
+      return res.json();
+    })
+    .then((data) => {
+      if (!data) return;
+      setCommunity(data);
+      return fetch(`/api/posts?communityId=${data.id}`);
+    })
+    .then((res) => {
+      if (!res) return;
+      if (!res.ok) return [];
+      return res.json();
+    })
+    .then((data) => {
+      if (data) { setPosts(Array.isArray(data) ? data : []); setLoading(false); }
+    })
+    .catch(() => { setLoading(false); setNotFound(true); });
+}, [slug]);
 
   const sortedPosts = [...posts].sort((a, b) => {
     if (sort === "top") return (b.voteScore || 0) - (a.voteScore || 0);
@@ -141,7 +145,7 @@ export default function CommunityPage() {
                 )}
                 <div className="flex gap-4 mt-2 text-xs text-gray-400">
                   <Link href={`/r/${slug}/${post.id}`} className="hover:text-orange-500">
-                    💬 {post._count.comments} comments
+                    💬 {post._count.comments} {post._count.comments === 1 ? "comment" : "comments"}
                   </Link>
                 </div>
               </div>
