@@ -1,5 +1,3 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/route";
 import SessionProvider from "./components/SessionProvider";
 import Navbar from "./components/Navbar";
 import "./globals.css";
@@ -12,12 +10,11 @@ export const metadata = {
   description: "A Reddit clone built with Next.js, Prisma and Supabase",
 };
 
-export default async function RootLayout({ children }) {
-  const session = await getServerSession(authOptions);
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="bg-gray-100 min-h-screen">
-        <SessionProvider session={session}>
+        <SessionProvider>
           <Navbar />
           <main className="max-w-5xl mx-auto px-4 py-6">
             {children}

@@ -14,15 +14,25 @@ export default function Home() {
   useEffect(() => {
     fetch("/api/posts")
       .then((res) => res.json())
-      .then((data) => { setPosts(data); setLoading(false); });
+      .then((data) => {
+        setPosts(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch(() => {
+        setPosts([]);
+        setLoading(false);
+      });
+
     fetch("/api/communities")
       .then((res) => res.json())
       .then((data) => {
-  const unique = data.filter((c, index, self) =>
-    index === self.findIndex((t) => t.slug === c.slug)
-  );
-  setCommunities(unique.slice(0, 5));
-});
+        const communities = Array.isArray(data) ? data : [];
+        const unique = communities.filter((c, index, self) =>
+          index === self.findIndex((t) => t.slug === c.slug)
+        );
+        setCommunities(unique.slice(0, 5));
+      })
+      .catch(() => setCommunities([]));
   }, []);
 
   const sortedPosts = [...posts].sort((a, b) => {
